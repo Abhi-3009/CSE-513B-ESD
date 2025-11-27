@@ -64,7 +64,7 @@ The `insert.sql` script creates these default users:
 
 *Note: You can also log in using **Google OAuth**.*
 
-## ⚙️ Google OAuth Configuration (Optional)
+## ⚙️ Google OAuth Configuration
 
 To enable "Sign in with Google":
 
