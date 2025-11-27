@@ -63,7 +63,7 @@ public class AuthMapper {
         user.setEmail(email);
         user.setGoogleId(googleId);
         user.setAuthProvider("google");
-        user.setRole("student");
+        // Role will be set by AuthService
 
         return user;
     }

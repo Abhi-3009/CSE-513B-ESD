@@ -27,6 +27,10 @@ public class AuthService {
     private final UserRepository userRepository;
     private final GoogleIdTokenVerifier googleVerifier;
     private static final java.util.Map<String, String> TOKENS = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final java.util.Map<String, String> TOKEN_USER_ROLE = new java.util.concurrent.ConcurrentHashMap<>();
+    
+    // Set this to your admin email to grant admin privileges
+    private static final String ADMIN_EMAIL = "abhijeet.rai3009@gmail.com";
 
     public AuthService(UserRepository userRepository, @Value("${google.client.id}") String googleClientId) {
         this.userRepository = userRepository;
@@ -63,13 +67,31 @@ public class AuthService {
         if (existingUser.isEmpty()) {
             // Create new user using mapper
             user = AuthMapper.createGoogleUser(email, googleId);
+            
+            // Assign admin role if email matches admin email
+            if (ADMIN_EMAIL.equals(email)) {
+                user.setRole("admin");
+            } else {
+                user.setRole("student");
+            }
+            
             user = userRepository.save(user);
         } else {
             user = existingUser.get();
+            // If role is not set, assign based on email
+            if (user.getRole() == null || user.getRole().isEmpty()) {
+                if (ADMIN_EMAIL.equals(email)) {
+                    user.setRole("admin");
+                } else {
+                    user.setRole("student");
+                }
+                user = userRepository.save(user);
+            }
         }
 
         String token = generateToken();
         TOKENS.put(token, email);
+        TOKEN_USER_ROLE.put(token, user.getRole());
 
         return AuthMapper.toAuthResponse(user, token, name);
     }
@@ -83,6 +105,7 @@ public class AuthService {
     public boolean logout(String token) {
         if (token != null && TOKENS.containsKey(token)) {
             TOKENS.remove(token);
+            TOKEN_USER_ROLE.remove(token);
             return true;
         }
         return false;
@@ -128,5 +151,18 @@ public class AuthService {
      */
     public Optional<User> findUserByUsername(String username) {
         return userRepository.findByEmail(username); // username parameter contains email
+    }
+
+    /**
+     * Get user role from token
+     * 
+     * @param token Authentication token
+     * @return Optional role
+     */
+    public Optional<String> getRoleFromToken(String token) {
+        if (token != null && TOKEN_USER_ROLE.containsKey(token)) {
+            return Optional.of(TOKEN_USER_ROLE.get(token));
+        }
+        return Optional.empty();
     }
 }
