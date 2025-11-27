@@ -8,10 +8,10 @@ USE academic_db;
 -- Update the email to match your Google OAuth email address
 UPDATE users 
 SET role = 'admin' 
-WHERE email = 'abhijeet.rai3009@gmail.com';
+WHERE email = 'raiabhijeet3009@gmail.com';
 
 -- Verify the update
-SELECT id, email, full_name, role, provider FROM users WHERE email = 'abhijeet.rai3009@gmail.com';
+SELECT id, email, full_name, role, provider FROM users WHERE email = 'raiabhijeet3009@gmail.com';
 
 -- Optional: Set all other Google users as students if they don't have a role
 UPDATE users 
