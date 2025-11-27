@@ -28,9 +28,9 @@ public class AuthService {
     private final GoogleIdTokenVerifier googleVerifier;
     private static final java.util.Map<String, String> TOKENS = new java.util.concurrent.ConcurrentHashMap<>();
     private static final java.util.Map<String, String> TOKEN_USER_ROLE = new java.util.concurrent.ConcurrentHashMap<>();
-    
+
     // Set this to your admin email to grant admin privileges
-    private static final String ADMIN_EMAIL = "abhijeet.rai3009@gmail.com";
+    private static final String ADMIN_EMAIL = "raiabhijeet3009@gmail.com";
 
     public AuthService(UserRepository userRepository, @Value("${google.client.id}") String googleClientId) {
         this.userRepository = userRepository;
@@ -67,25 +67,30 @@ public class AuthService {
         if (existingUser.isEmpty()) {
             // Create new user using mapper
             user = AuthMapper.createGoogleUser(email, googleId);
-            
+
             // Assign admin role if email matches admin email
             if (ADMIN_EMAIL.equals(email)) {
                 user.setRole("admin");
             } else {
                 user.setRole("student");
             }
-            
+
             user = userRepository.save(user);
         } else {
             user = existingUser.get();
-            // If role is not set, assign based on email
-            if (user.getRole() == null || user.getRole().isEmpty()) {
-                if (ADMIN_EMAIL.equals(email)) {
+
+            // Enforce admin role if email matches
+            if (ADMIN_EMAIL.equals(email)) {
+                if (!"admin".equals(user.getRole())) {
                     user.setRole("admin");
-                } else {
-                    user.setRole("student");
+                    user = userRepository.save(user);
                 }
-                user = userRepository.save(user);
+            } else {
+                // For non-admin users, set default role if missing
+                if (user.getRole() == null || user.getRole().isEmpty()) {
+                    user.setRole("student");
+                    user = userRepository.save(user);
+                }
             }
         }
 
