@@ -1,0 +1,35 @@
+# Maven
+target/
+*.jar
+*.war
+*.ear
+*.log
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# VS Code
+.vscode/
+
+# Node.js / React
+node_modules/
+build/
+dist/
+.env
+.DS_Store
+coverage/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
